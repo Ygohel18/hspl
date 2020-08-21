@@ -7,6 +7,7 @@ class Hspl(object):
         self.chrome_driver_path = "includes/chromedriver"
         self.browser_profile = webdriver.ChromeOptions()
         self.browser_profile.add_experimental_option('prefs', {'intl.accept_languages': 'en,en_IN'})
+        self.browser_profile.add_argument('headless')
         self.browser = webdriver.Chrome(self.chrome_driver_path, chrome_options=self.browser_profile)
         self.url = "hostingspell.com"
         # Default wait time
