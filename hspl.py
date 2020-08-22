@@ -1,6 +1,7 @@
 import time
-from datetime import datetime
+import json
 from selenium import webdriver
+
 
 class Hspl(object):
     def __init__(self):
@@ -10,37 +11,58 @@ class Hspl(object):
         self.browser_profile.add_argument('headless')
         self.browser_profile.add_argument('--no-sandbox')
         self.browser = webdriver.Chrome(self.chrome_driver_path, chrome_options=self.browser_profile)
-        self.url = "hostingspell.com"
         # Default wait time
         self.rest = 3
 
-    def check(self):
-        self.browser.get('https://google.co.in/search?q=cheap+web+hosting+in+india&num=20')
+    def check(self, search_query, url):
+        search_num = 20
+        search = "https://google.co.in/search?q=" + search_query + "&num=" + str(search_num)
+        self.browser.get(search)
         time.sleep(self.rest)
 
-        # CITE Element
         url_list = []
+        url_title_list = []
+        data_ary = []
 
         get_list = self.browser.find_elements_by_css_selector('div.r>a')
+        get_list_title = self.browser.find_elements_by_css_selector('div.r>a>h3')
 
         for i in get_list:
             url_list.append(i.get_attribute("host"))
 
+        for t in get_list_title:
+            url_title_list.append(t.get_attribute("textContent"))
+
         count = 0
+        rank = 0
         for i in url_list:
             count = count + 1
-            if i == self.url:
-                return count
+            if i == url:
+                rank = count
 
-    def save_log(self):
-        count = self.check()
-        ctime = datetime.now()
-        stime = ctime.strftime("%d-%b-%Y (%H:%M:%S.%f)")
+        c = 0
 
-        add = stime + " : " + str(count)
+        data = {
+            "your_rank": int(rank),
+            "your_url": str(url),
+            "your_keyword": str(search_query)
+        }
 
-        with open("hspltrack.txt", "a") as f:
-            f.write(add)
+        data_ary.append(data)
+
+        for i in url_list:
+            data = {
+                "rank": int(c + 1),
+                "link": (str(i)),
+                "text": str(url_title_list[c])
+            }
+
+            data_ary.append(data)
+            c = c + 1
+
+        res = json.dumps(data_ary)
+
+        return res
 
     # Close browser it self
     def close_browser(self):

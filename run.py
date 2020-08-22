@@ -1,5 +1,9 @@
 import hspl
 
+query = "indias cheap web hosting"
+url = "hostingspell.com"
+
 h = hspl.Hspl()
-h.save_log()
+result = h.check(query, url)
+print(result)
 h.close_browser()
